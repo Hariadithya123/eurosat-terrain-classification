@@ -39,6 +39,7 @@ Prediction: Residential (97.65%)
 - Google Colab
 - EuroSAT Dataset
 
-## Author
-Hari Adithya v
 Made with ❤️ using Python and Colab.
+
+## Author
+Hari Adithya V
