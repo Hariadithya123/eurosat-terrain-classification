@@ -1,0 +1,40 @@
+!pip install gradio  # Install Gradio
+
+from google.colab import drive
+from PIL import Image
+import gradio as gr
+import tensorflow as tf
+import numpy as np
+
+# Mount Google Drive to access the model
+drive.mount('/content/drive')
+
+# Load the pre-trained model
+model = tf.keras.models.load_model('/content/drive/MyDrive/EuroSAT_TF/eurosat_tf_model.h5')
+class_names = ['Forest', 'Highway', 'Residential', 'River']
+IMG_SIZE = (224, 224)
+
+# Define the prediction function
+def predict_terrain(img):
+    img = img.resize(IMG_SIZE)
+    img_array = tf.keras.utils.img_to_array(img)
+    img_array = tf.expand_dims(img_array, 0)
+    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+
+    preds = model.predict(img_array)
+    label = class_names[np.argmax(preds)]
+    confidence = 100 * np.max(preds)
+
+    return f"{label} ({confidence:.2f}%)"
+
+# Create the Gradio interface
+interface = gr.Interface(
+    fn=predict_terrain,
+    inputs=gr.Image(type="pil"),
+    outputs="text",
+    title="🌍 EuroSAT Terrain Classifier",
+    description="Upload a satellite image to classify it into Forest, Highway, River, or Residential."
+)
+
+# Launch the interface
+interface.launch(share=True, auth=None)  # Public link, no authentication required
